@@ -3,6 +3,7 @@ import pino from 'pino-http';
 import cors from 'cors';
 
 import { env } from './utils/env.js';
+import { getAllStudents, getStudentById } from './services/students.js';
 
 // Читаємо змінну оточення PORT
 const PORT = Number(env('PORT', '3000'));
@@ -31,6 +32,25 @@ export const startServer = () => {
   app.get('/', (req, res) => {
     res.json({
       message: 'Hello world!',
+    });
+  });
+
+  // Отримання колекції всіх студентів
+  app.get('/students', async (req, res) => {
+    const students = await getAllStudents();
+
+    res.status(200).json({
+      data: students,
+    });
+  });
+
+  // Отримання студента за його id
+  app.get('/students/:studentId', async (req, res) => {
+    const { studentId } = req.params;
+    const student = await getStudentById(studentId);
+
+    res.status(200).json({
+      data: student,
     });
   });
 
