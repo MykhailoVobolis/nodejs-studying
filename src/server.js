@@ -2,8 +2,14 @@ import express from 'express';
 import pino from 'pino-http';
 import cors from 'cors';
 
+// Імпортуємо роутер
+import studentsRouter from './routers/students.js';
+
 import { env } from './utils/env.js';
-import { getAllStudents, getStudentById } from './services/students.js';
+
+// Імпортуємо middleware
+import { errorHandler } from './middlewares/errorHandler.js';
+import { notFoundHandler } from './middlewares/notFoundHandler.js';
 
 // Читаємо змінну оточення PORT
 const PORT = Number(env('PORT', '3000'));
@@ -35,40 +41,15 @@ export const startServer = () => {
     });
   });
 
-  // Отримання колекції всіх студентів
-  app.get('/students', async (req, res) => {
-    const students = await getAllStudents();
+  // Додаємо роутер до app як middleware
+  app.use(studentsRouter);
 
-    res.status(200).json({
-      data: students,
-    });
-  });
+  // Додаємо Middleware для обробки випадку, коли клієнт звертається до неіснуючого маршруту
+  app.use('*', notFoundHandler);
 
-  // Отримання студента за його id
-  app.get('/students/:studentId', async (req, res) => {
-    const { studentId } = req.params;
-    const student = await getStudentById(studentId);
-
-    res.status(200).json({
-      data: student,
-    });
-  });
-
-  // Middleware для обробки випадку, коли клієнт звертається до неіснуючого маршруту
-  app.use('*', (req, res, next) => {
-    res.status(404).json({
-      message: 'Not found',
-    });
-  });
-
-  // Middleware для обробких помилок (приймає 4 аргументи)
+  // Додаємо Middleware для обробких помилок
   // додається завжди самим останнім, після всіх інших middleware та маршрутів
-  app.use((err, req, res, next) => {
-    res.status(500).json({
-      message: 'Something went wrong',
-      error: err.message,
-    });
-  });
+  app.use(errorHandler);
 
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
