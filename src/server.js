@@ -1,5 +1,4 @@
 import express from 'express';
-import pino from 'pino-http';
 import cors from 'cors';
 
 // Імпортуємо роутер
@@ -10,6 +9,7 @@ import { env } from './utils/env.js';
 // Імпортуємо middleware
 import { errorHandler } from './middlewares/errorHandler.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
+import { logger } from './middlewares/logger.js';
 
 // Читаємо змінну оточення PORT
 const PORT = Number(env('PORT', '3000'));
@@ -18,21 +18,15 @@ const PORT = Number(env('PORT', '3000'));
 export const startServer = () => {
   const app = express();
 
+  // Middleware для логування, такий як pino-http, слід розташовувати якомога раніше у ланцюгу middleware
+  app.use(logger);
+
   // Вбудований у express middleware для обробки (парсингу) JSON-даних у запитах
   // наприклад, у запитах POST або PATCH
   app.use(express.json());
 
   // Middleware CORS
   app.use(cors());
-
-  // Middleware для логування, такий як pino-http, слід розташовувати якомога раніше у ланцюгу middleware
-  app.use(
-    pino({
-      transport: {
-        target: 'pino-pretty',
-      },
-    }),
-  );
 
   // Функція-обробник запиту
   app.get('/', (req, res) => {
