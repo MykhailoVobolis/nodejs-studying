@@ -65,7 +65,10 @@ export const updateStudent = async (studentId, payload, options = {}) => {
     { _id: studentId },
     payload,
     {
-      new: true,
+      // Якщо використовуєть Mongoose хук setUpdateSettings наступні рядки можна видалити
+
+      // new: true,
+      // runValidators: true,
       includeResultMetadata: true,
       ...options,
     },
