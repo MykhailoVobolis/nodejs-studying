@@ -1,9 +1,31 @@
 import { StudentsCollection } from '../db/models/student.js';
+import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 
-// Сервіс-функція яка отримує всіх студентів з бази данних
-export const getAllStudents = async () => {
-  const students = await StudentsCollection.find();
-  return students;
+// Сервіс-функція яка отримує всіх студентів з бази данних без пагінації
+
+// export const getAllStudents = async () => {
+//   const students = await StudentsCollection.find();
+//   return students;
+// };
+
+// Сервіс-функція яка отримує всіх студентів з бази данних з пагинацією
+export const getAllStudents = async ({ page, perPage }) => {
+  const limit = perPage;
+  const skip = (page - 1) * perPage;
+
+  const studentsQuery = StudentsCollection.find();
+  const studentsCount = await StudentsCollection.find()
+    .merge(studentsQuery)
+    .countDocuments();
+
+  const students = await studentsQuery.skip(skip).limit(limit).exec();
+
+  const paginationData = calculatePaginationData(studentsCount, perPage, page);
+
+  return {
+    data: students,
+    ...paginationData,
+  };
 };
 
 // Сервіс-функція яка отримує одного студента з бази данних за його ID

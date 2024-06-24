@@ -8,10 +8,15 @@ import {
   getStudentById,
   updateStudent,
 } from '../services/students.js';
+import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 
 // Контроллер отримання колекції всіх студентів з бази даних. GET
-export const getStudentsController = async (req, res, next) => {
-  const students = await getAllStudents();
+export const getStudentsController = async (req, res, _next) => {
+  const { page, perPage } = parsePaginationParams(req.query);
+  const students = await getAllStudents({
+    page,
+    perPage,
+  });
 
   res.json({
     status: 200,
