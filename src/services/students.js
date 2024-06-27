@@ -23,6 +23,7 @@ export const getAllStudents = async ({
   const studentsCount = await StudentsCollection.find()
     .merge(studentsQuery)
     .countDocuments();
+  const totalItems = await StudentsCollection.countDocuments();
 
   const students = await studentsQuery
     .skip(skip)
@@ -30,10 +31,16 @@ export const getAllStudents = async ({
     .sort({ [sortBy]: sortOrder })
     .exec();
 
-  const paginationData = calculatePaginationData(studentsCount, perPage, page);
+  const paginationData = calculatePaginationData(
+    totalItems,
+    studentsCount,
+    perPage,
+    page,
+  );
 
   return {
     data: students,
+    totalItems,
     ...paginationData,
   };
 };
