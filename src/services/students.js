@@ -15,28 +15,64 @@ export const getAllStudents = async ({
   perPage = 10,
   sortOrder = SORT_ORDER.ASC,
   sortBy = '_id',
+  filter = {},
 }) => {
   const limit = perPage;
   const skip = (page - 1) * perPage;
 
   const studentsQuery = StudentsCollection.find();
-  const studentsCount = await StudentsCollection.find()
-    .merge(studentsQuery)
-    .countDocuments();
-  const totalItems = await StudentsCollection.countDocuments();
 
-  const students = await studentsQuery
-    .skip(skip)
-    .limit(limit)
-    .sort({ [sortBy]: sortOrder })
-    .exec();
+  // Частина коду, яка відповідає за фільтрацію в функції getAllStudents, дозволяє здійснювати вибірку студентів за певними критеріями, що передаються через об'єкт filter. Ця фільтрація реалізована через методи where, equals, lte (less than or equal to), та gte (greater than or equal to), які є частиною запитів до бази даних MongoDB через Mongoose.
 
-  const paginationData = calculatePaginationData(
-    totalItems,
-    studentsCount,
-    perPage,
-    page,
-  );
+  // Фільтрація за статтю
+  if (filter.gender) {
+    studentsQuery.where('gender').equals(filter.gender);
+  }
+  // Фільтрація за віком
+  if (filter.maxAge) {
+    studentsQuery.where('age').lte(filter.maxAge);
+  }
+  if (filter.minAge) {
+    studentsQuery.where('age').gte(filter.minAge);
+  }
+  // Фільтрація за середньою оцінкою
+  if (filter.maxAvgMark) {
+    studentsQuery.where('avgMark').lte(filter.maxAvgMark);
+  }
+  if (filter.minAvgMark) {
+    studentsQuery.where('avgMark').gte(filter.minAvgMark);
+  }
+
+  // !!! Можемо трохи покращити швидкодію нашого додатка за допомогою Promise.all():
+
+  /* Замість цього коду */
+
+  // const studentsCount = await StudentsCollection.find()
+  //   .merge(studentsQuery)
+  //   .countDocuments();
+
+  // const totalItems = await StudentsCollection.countDocuments();
+
+  // const students = await studentsQuery
+  //   .skip(skip)
+  //   .limit(limit)
+  //   .sort({ [sortBy]: sortOrder })
+  //   .exec();
+
+  /* Ми можемо написати такий код */
+  const [studentsCount, totalItems, students] = await Promise.all([
+    StudentsCollection.find().merge(studentsQuery).countDocuments(),
+
+    StudentsCollection.countDocuments(),
+
+    studentsQuery
+      .skip(skip)
+      .limit(limit)
+      .sort({ [sortBy]: sortOrder })
+      .exec(),
+  ]);
+
+  const paginationData = calculatePaginationData(studentsCount, perPage, page);
 
   return {
     data: students,
