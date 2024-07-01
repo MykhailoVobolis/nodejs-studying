@@ -12,6 +12,7 @@ export const registerUser = async (payload) => {
   // У разі дублювання, повертає відповідь зі статусом 409 і відповідним повідомленням.
   const user = await UsersCollection.findOne({ email: payload.email });
   if (user) throw createHttpError(409, 'Email in use');
+
   // Хешування для зберігання паролю за допомогою бібліотеки bcrypt
   const encryptedPassword = await bcrypt.hash(payload.password, 10);
   return await UsersCollection.create({
