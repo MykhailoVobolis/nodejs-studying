@@ -1,8 +1,9 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 // Імпортуємо роутер
-import studentsRouter from './routers/students.js';
+import router from './routers/index.js';
 
 import { env } from './utils/env.js';
 
@@ -28,6 +29,9 @@ export const startServer = () => {
   // Middleware CORS
   app.use(cors());
 
+  // Middleware cookie-parser
+  app.use(cookieParser());
+
   // Функція-обробник запиту
   app.get('/', (req, res) => {
     res.json({
@@ -36,7 +40,7 @@ export const startServer = () => {
   });
 
   // Додаємо роутер до app як middleware
-  app.use(studentsRouter);
+  app.use(router);
 
   // Додаємо Middleware для обробки випадку, коли клієнт звертається до неіснуючого маршруту
   app.use('*', notFoundHandler);
