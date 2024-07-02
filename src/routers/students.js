@@ -11,12 +11,16 @@ import {
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import { validateBody } from '../middlewares/validateBody.js';
 import { isValidId } from '../middlewares/isValidId.js';
+import { authenticate } from '../middlewares/authenticate.js';
 import {
   createStudentSchema,
   updateStudentSchema,
 } from '../validation/students.js';
 
 const router = Router();
+
+// Middleware authenticate для запитів до колекції студентів
+router.use(authenticate);
 
 // Обов'язкове обгортання контролерів у функцію ctrlWrapper для обробки можливих помилок шо приходять з бекенду
 
