@@ -11,6 +11,7 @@ import {
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseFilterParams } from '../utils/parseFilterParams.js';
+import { saveFileToUploadDir } from '../utils/saveFileToUploadDir.js';
 
 // Контроллер отримання колекції всіх студентів з бази даних. GET
 export const getStudentsController = async (req, res, _next) => {
@@ -123,9 +124,34 @@ export const patchStudentController = async (req, res, next) => {
   {
     const { studentId } = req.params;
 
+    // Отримаємо обʼєкт зображення в тілі контролеру:
+    const photo = req.file;
+
+    /* в photo лежить обʼєкт файлу
+		{
+		  fieldname: 'photo',
+		  originalname: 'download.jpeg',
+		  encoding: '7bit',
+		  mimetype: 'image/jpeg',
+		  destination: '/Users/borysmeshkov/Projects/goit-study/students-app/temp',
+		  filename: '1710709919677_download.jpeg',
+		  path: '/Users/borysmeshkov/Projects/goit-study/students-app/temp/1710709919677_download.jpeg',
+		  size: 7
+	  }
+	*/
+
+    let photoUrl;
+
+    if (photo) {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
+
     // Перевикористання функції updateStudent яку ми до цього створили для PUT ендпоінта.
     // Єдина відмінність буде полягати в тому, що ми не будемо під час виклику нічого передавати третім аргументом options, оскільки ми завчасно продумали цей варіант і задали options дефолтне значення як порожній об’єкт.
-    const result = await updateStudent(studentId, req.body);
+    const result = await updateStudent(studentId, {
+      ...req.body,
+      photo: photoUrl,
+    });
 
     // Обробка помилки, якщо студента по такому id не буде знайдно.
     if (!result) {

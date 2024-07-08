@@ -11,6 +11,7 @@ import { env } from './utils/env.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { logger } from './middlewares/logger.js';
+import { UPLOAD_DIR } from './constants/index.js';
 
 // Читаємо змінну оточення PORT
 const PORT = Number(env('PORT', '3000'));
@@ -41,6 +42,9 @@ export const startServer = () => {
 
   // Додаємо роутер до app як middleware
   app.use(router);
+
+  // Додамо до express можливість роздавати статичні файли:
+  app.use('/uploads', express.static(UPLOAD_DIR));
 
   // Додаємо Middleware для обробки випадку, коли клієнт звертається до неіснуючого маршруту
   app.use('*', notFoundHandler);

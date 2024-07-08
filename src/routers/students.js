@@ -18,6 +18,7 @@ import {
   updateStudentSchema,
 } from '../validation/students.js';
 import { ROLES } from '../constants/index.js';
+import { upload } from '../middlewares/multer.js';
 
 const router = Router();
 
@@ -42,6 +43,7 @@ router.post(
   '',
   checkRoles(ROLES.TEACHER),
   validateBody(createStudentSchema),
+  upload.single('photo'), // middleware додавання файлу
   ctrlWrapper(createStudentController),
 );
 
@@ -58,6 +60,7 @@ router.put(
   '/:studentId',
   checkRoles(ROLES.TEACHER),
   validateBody(createStudentSchema),
+  upload.single('photo'), // middleware додавання файлу
   ctrlWrapper(upsertStudentController),
 );
 
@@ -66,6 +69,7 @@ router.patch(
   '/:studentId',
   checkRoles(ROLES.TEACHER, ROLES.PARENT),
   validateBody(updateStudentSchema),
+  upload.single('photo'), // middleware додавання файлу
   ctrlWrapper(patchStudentController),
 );
 
