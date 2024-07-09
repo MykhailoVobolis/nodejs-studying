@@ -23,6 +23,7 @@ export const SMTP = {
   SMTP_FROM: 'SMTP_FROM',
 };
 
+// Абсолютний шлях до папки templates
 export const TEMPLATES_DIR = path.join(process.cwd(), 'src', 'templates');
 
 // Константи для збереження завантажених файлів у визначеній директорії
