@@ -25,3 +25,8 @@ export const resetPasswordSchema = Joi.object({
   password: Joi.string().required(),
   token: Joi.string().required(),
 });
+
+// Joi схема для валідації при Google аутентифікації
+export const loginWithGoogleOAuthSchema = Joi.object({
+  code: Joi.string().required(),
+});
