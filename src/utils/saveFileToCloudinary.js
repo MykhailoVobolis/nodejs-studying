@@ -16,5 +16,9 @@ cloudinary.v2.config({
 // Потім створюється асинхронна функція для збереження файлів. Ця функція приймає файл, завантажує його на сервер Cloudinary і повертає безпечну URL-адресу завантаженого файлу.
 export const saveFileToCloudinary = async (file) => {
   const response = await cloudinary.v2.uploader.upload(file.path);
+
+  // Видалення файлу з тимчасової папки
+  await fs.unlink(file.path);
+
   return response.secure_url;
 };

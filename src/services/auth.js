@@ -46,11 +46,15 @@ export const loginUser = async (payload) => {
   }
 
   // функціонал по створенню сесій
+
+  // Видалення попередньої сесії користувача, якщо така існує, з колекції сесій.
   await SessionsCollection.deleteOne({ userId: user._id });
 
+  // Генерація нових токенів доступу та оновлення.
   const accessToken = randomBytes(30).toString('base64');
   const refreshToken = randomBytes(30).toString('base64');
 
+  // Створення нової сесії в базі даних
   return await SessionsCollection.create({
     userId: user._id,
     accessToken,
@@ -62,6 +66,7 @@ export const loginUser = async (payload) => {
 
 // Сервіс-функція для logout користувача
 export const logoutUser = async (sessionId) => {
+  // Видалення поточної сессії користувача
   await SessionsCollection.deleteOne({ _id: sessionId });
 };
 
@@ -158,7 +163,7 @@ export const requestResetToken = async (email) => {
   });
 };
 
-// Сервіс-функція для скидання паролю
+// Сервіс-функція для зміни паролю
 export const resetPassword = async (payload) => {
   let entries;
 
@@ -184,4 +189,7 @@ export const resetPassword = async (payload) => {
     { _id: user._id },
     { password: encryptedPassword },
   );
+
+  // Видалення поточної сесії користувача при зміні паролю
+  await SessionsCollection.deleteOne({ userId: user._id });
 };
