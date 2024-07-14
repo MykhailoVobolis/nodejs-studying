@@ -12,6 +12,7 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { logger } from './middlewares/logger.js';
 import { UPLOAD_DIR } from './constants/index.js';
+import { swaggerDocs } from './middlewares/swaggerDocs.js';
 
 // Читаємо змінну оточення PORT
 const PORT = Number(env('PORT', '3000'));
@@ -45,6 +46,9 @@ export const startServer = () => {
 
   // Додамо до express можливість роздавати статичні файли:
   app.use('/uploads', express.static(UPLOAD_DIR));
+
+  // Додамо Middleware яка буде повертати нам або роут для swagger, або 500 помилку
+  app.use('/api-docs', swaggerDocs());
 
   // Додаємо Middleware для обробки випадку, коли клієнт звертається до неіснуючого маршруту
   app.use('*', notFoundHandler);
