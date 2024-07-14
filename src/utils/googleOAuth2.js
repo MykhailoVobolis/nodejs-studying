@@ -2,7 +2,7 @@ import { OAuth2Client } from 'google-auth-library';
 import path from 'node:path';
 import { readFile } from 'fs/promises';
 
-import { env } from './env.js';
+import { env, ENV_VARS } from './env.js';
 import createHttpError from 'http-errors';
 
 // СТВОРЕННЯ ПОСИЛАННЯ за яким буде відбуватися Google аутентифікація
@@ -18,8 +18,10 @@ const oauthConfig = JSON.parse(await readFile(PATH_JSON));
 // clientSecret: Секрет клієнта, отриманий зі змінних оточення.
 // redirectUri: URI, на який буде перенаправлено користувача після аутентифікації.
 const googleOAuthClient = new OAuth2Client({
-  clientId: env('GOOGLE_AUTH_CLIENT_ID'),
-  clientSecret: env('GOOGLE_AUTH_CLIENT_SECRET'),
+  // clientId: env('GOOGLE_AUTH_CLIENT_ID'),
+  // clientSecret: env('GOOGLE_AUTH_CLIENT_SECRET'),
+  clientId: env(ENV_VARS.GOOGLE_AUTH_CLIENT_ID), // заміняємо змінні оточення
+  clientSecret: env(ENV_VARS.GOOGLE_AUTH_CLIENT_SECRET), // заміняємо змінні оточення
   redirectUri: oauthConfig.web.redirect_uris[0],
 });
 
